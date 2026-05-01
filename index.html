@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Generative Design Engine</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">OpenFOAM-backed inverse design</p>
+          <h1>Generative Design Engine</h1>
+          <p>
+            A compact diffusion and cGAN workflow for proposing cylinder-flow geometries from target drag
+            coefficients, then validating candidates across laminar and turbulent regimes.
+          </p>
+          <div class="actions">
+            <a href="combined_final.csv">Download dataset</a>
+            <a href="validation_final.csv" class="secondary">Validation results</a>
+          </div>
+        </div>
+        <div class="hero-panel" aria-label="Model summary">
+          <span class="metric-label">Final validation mean error</span>
+          <strong id="mean-error">Loading</strong>
+          <span id="sample-count">Reading validation_final.csv</span>
+        </div>
+      </section>
+
+      <section class="metrics" aria-label="Dataset metrics">
+        <article>
+          <span>Training rows</span>
+          <strong id="training-rows">-</strong>
+        </article>
+        <article>
+          <span>Laminar cases</span>
+          <strong id="laminar-count">-</strong>
+        </article>
+        <article>
+          <span>Turbulent cases</span>
+          <strong id="turbulent-count">-</strong>
+        </article>
+        <article>
+          <span>Drag range</span>
+          <strong id="drag-range">-</strong>
+        </article>
+      </section>
+
+      <section class="gallery">
+        <figure>
+          <img src="validation_final.png" alt="Validation chart comparing target and simulated drag coefficients" />
+          <figcaption>Final diffusion validation</figcaption>
+        </figure>
+        <figure>
+          <img src="diffusion_loss.png" alt="Diffusion training loss curve" />
+          <figcaption>Diffusion convergence</figcaption>
+        </figure>
+        <figure>
+          <img src="cgan_improved_designs.png" alt="Generated cGAN design samples" />
+          <figcaption>cGAN design samples</figcaption>
+        </figure>
+      </section>
+
+      <section class="table-section">
+        <div>
+          <p class="eyebrow">Validated candidates</p>
+          <h2>Target Cd to simulated Cd</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Target</th>
+                <th>Regime</th>
+                <th>Diameter</th>
+                <th>Actual Cd</th>
+                <th>Error</th>
+              </tr>
+            </thead>
+            <tbody id="validation-table"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

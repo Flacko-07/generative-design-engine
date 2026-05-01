@@ -1,0 +1,27 @@
+# Simulation and generated OpenFOAM case directories
+*/
+!api/
+
+# Python/runtime clutter
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+.venv/
+venv/
+env/
+oae/
+
+# Trained model artifacts and binary scalers
+*.h5
+*.keras
+*.pkl
+*.gz
+
+# Logs and scratch files
+*.log
+*.txt
+
+# Vercel local metadata
+.vercel/
+
