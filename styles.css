@@ -26,12 +26,10 @@ main {
 }
 
 .hero {
-  min-height: 68vh;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  min-height: 56vh;
+  display: flex;
   align-items: center;
-  gap: 48px;
-  padding: 64px 0 40px;
+  padding: 64px 0 34px;
 }
 
 .hero-copy h1 {
@@ -85,7 +83,6 @@ main {
   color: var(--accent-dark);
 }
 
-.hero-panel,
 .metrics article,
 .gallery figure,
 .table-wrap {
@@ -95,24 +92,12 @@ main {
   box-shadow: 0 18px 50px rgba(18, 31, 29, 0.07);
 }
 
-.hero-panel {
-  padding: 28px;
-}
-
 .metric-label,
-.metrics span,
-.hero-panel span:last-child {
+.metrics span {
   color: var(--muted);
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
-}
-
-.hero-panel strong {
-  display: block;
-  margin: 14px 0 8px;
-  color: var(--accent-dark);
-  font-size: 54px;
 }
 
 .metrics {
@@ -271,7 +256,6 @@ td {
 }
 
 @media (max-width: 880px) {
-  .hero,
   .table-section,
   .inference {
     grid-template-columns: 1fr;
