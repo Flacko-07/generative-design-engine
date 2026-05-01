@@ -24,14 +24,10 @@ async function render() {
     loadCsv("combined_final.csv"),
   ]);
 
-  const errors = validation.map((row) => Number(row["relative_error_%"])).filter(Number.isFinite);
-  const mean = errors.reduce((sum, value) => sum + value, 0) / errors.length;
   const laminar = training.filter((row) => row.flow_regime === "0").length;
   const turbulent = training.filter((row) => row.flow_regime === "1").length;
   const cds = training.map((row) => Number(row.Cd)).filter(Number.isFinite);
 
-  document.querySelector("#mean-error").textContent = `${fmt(mean, 1)}%`;
-  document.querySelector("#sample-count").textContent = `${validation.length} validation simulations`;
   document.querySelector("#training-rows").textContent = training.length.toLocaleString();
   document.querySelector("#laminar-count").textContent = laminar.toLocaleString();
   document.querySelector("#turbulent-count").textContent = turbulent.toLocaleString();
@@ -51,7 +47,44 @@ async function render() {
     .join("");
 }
 
-render().catch((error) => {
-  document.querySelector("#mean-error").textContent = "Offline";
-  document.querySelector("#sample-count").textContent = error.message;
+function renderDesigns(payload) {
+  document.querySelector("#inference-status").textContent =
+    `${payload.input.regime_label} candidates for Cd ${fmt(payload.input.cd, 2)}`;
+  document.querySelector("#inference-latency").textContent = `API latency: ${payload.latency_ms} ms`;
+  document.querySelector("#design-table").innerHTML = payload.designs
+    .map((row) => `<tr>
+      <td>${row.rank}</td>
+      <td>${fmt(row.diameter, 5)}</td>
+      <td>${fmt(row.x_center, 5)}</td>
+      <td>${fmt(row.channel_height, 5)}</td>
+      <td>${fmt(row.predicted_Cd, 4)}</td>
+      <td>${fmt(row.Re, 0)}</td>
+    </tr>`)
+    .join("");
+}
+
+async function generateDesigns(event) {
+  event.preventDefault();
+  const params = new URLSearchParams(new FormData(event.currentTarget));
+  document.querySelector("#inference-status").textContent = "Generating";
+  document.querySelector("#inference-latency").textContent = "API latency: running";
+
+  const response = await fetch(`/api/generate?${params.toString()}`);
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error || "Generation failed");
+  renderDesigns(payload);
+}
+
+document.querySelector("#generate-form").addEventListener("submit", (event) => {
+  generateDesigns(event).catch((error) => {
+    document.querySelector("#inference-status").textContent = error.message;
+    document.querySelector("#inference-latency").textContent = "API latency: -";
+  });
 });
+
+render().catch((error) => {
+  document.querySelector("#training-rows").textContent = "Offline";
+  document.querySelector("#validation-table").innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
+});
+
+document.querySelector("#generate-form").dispatchEvent(new Event("submit", { cancelable: true }));

@@ -15,3 +15,18 @@ This repository intentionally keeps only the final source scripts, CSV datasets,
 
 Vercel can deploy this as a static site from the repository root.
 
+## Fast Inference
+
+Use the lightweight inference script locally:
+
+```bash
+python3 inference.py --cd 1.10 --regime 1 --count 5
+```
+
+The deployed Vercel app exposes the same idea at:
+
+```text
+/api/generate?cd=1.10&regime=1&count=5
+```
+
+`regime=0` is laminar and `regime=1` is turbulent.

@@ -13,24 +13,70 @@
           <p class="eyebrow">OpenFOAM-backed inverse design</p>
           <h1>Generative Design Engine</h1>
           <p>
-            A compact diffusion and cGAN workflow for proposing cylinder-flow geometries from target drag
-            coefficients, then validating candidates across laminar and turbulent regimes.
+            Generate cylinder-flow geometry candidates from a target drag coefficient in milliseconds,
+            then inspect the validated training space that shaped the engine.
           </p>
           <div class="actions">
-            <a href="combined_final.csv">Download dataset</a>
+            <a href="#inference">Generate designs</a>
             <a href="validation_final.csv" class="secondary">Validation results</a>
           </div>
         </div>
         <div class="hero-panel" aria-label="Model summary">
-          <span class="metric-label">Final validation mean error</span>
-          <strong id="mean-error">Loading</strong>
-          <span id="sample-count">Reading validation_final.csv</span>
+          <span class="metric-label">Inference route</span>
+          <strong>/api/generate</strong>
+          <span>Cd + regime to candidate designs</span>
+        </div>
+      </section>
+
+      <section class="inference" id="inference" aria-label="Generate candidate designs">
+        <form id="generate-form" class="inference-form">
+          <div>
+            <p class="eyebrow">On-demand inference</p>
+            <h2>Generate designs for any Cd and regime</h2>
+          </div>
+          <label>
+            Target Cd
+            <input id="target-cd" name="cd" type="number" min="0.1" max="3" step="0.01" value="1.10" />
+          </label>
+          <label>
+            Regime
+            <select id="regime" name="regime">
+              <option value="1">Turbulent</option>
+              <option value="0">Laminar</option>
+            </select>
+          </label>
+          <label>
+            Designs
+            <input id="design-count" name="count" type="number" min="1" max="12" step="1" value="5" />
+          </label>
+          <button type="submit">Generate</button>
+        </form>
+        <div class="inference-result">
+          <div class="result-bar">
+            <span id="inference-status">Ready</span>
+            <span id="inference-latency">API latency: -</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Diameter</th>
+                  <th>X center</th>
+                  <th>Height</th>
+                  <th>Pred Cd</th>
+                  <th>Re</th>
+                </tr>
+              </thead>
+              <tbody id="design-table"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
       <section class="metrics" aria-label="Dataset metrics">
         <article>
-          <span>Training rows</span>
+          <span>Final rows</span>
           <strong id="training-rows">-</strong>
         </article>
         <article>
