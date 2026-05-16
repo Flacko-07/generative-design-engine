@@ -1,129 +1,186 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Generative Design Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+
+    <!-- NAV -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <div class="nav-inner">
+        <a href="#" class="nav-logo" aria-label="Generative Design Engine home">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="currentColor" stroke-width="1.8" fill="none"/>
+            <polygon points="14,7 21,11 21,17 14,21 7,17 7,11" fill="currentColor" opacity="0.25"/>
+            <circle cx="14" cy="14" r="3" fill="currentColor"/>
+          </svg>
+          <span>GDE</span>
+        </a>
+        <div class="nav-links">
+          <a href="#inference">Inference</a>
+          <a href="#data">Dataset</a>
+          <a href="https://github.com/Flacko-07/generative-design-engine" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+        <button class="theme-toggle" data-theme-toggle aria-label="Switch to light mode">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </button>
+      </div>
+    </nav>
+
     <main>
-      <section class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow">OpenFOAM-backed inverse design</p>
-          <h1>Generative Design Engine</h1>
-          <p>
-            Generate cylinder-flow geometry candidates from a target drag coefficient in milliseconds,
-            then inspect the validated training space that shaped the engine.
-          </p>
-          <div class="actions">
-            <a href="#inference">Generate designs</a>
-            <a href="validation_final.csv" class="secondary">Validation results</a>
-          </div>
+
+      <!-- HERO -->
+      <section class="hero" aria-label="Introduction">
+        <div class="hero-tag">OpenFOAM-backed Inverse Design</div>
+        <h1 class="hero-title">Generative<br><em>Design</em> Engine</h1>
+        <p class="hero-sub">Generate cylinder-flow geometry candidates from a target drag coefficient in milliseconds, backed by a diffusion model trained on thousands of validated OpenFOAM simulations.</p>
+        <div class="hero-actions">
+          <a href="#inference" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polygon points="5,3 19,12 5,21"/></svg>
+            Generate designs
+          </a>
+          <a href="validation_final.csv" class="btn btn-ghost">Validation CSV</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><strong id="training-rows">—</strong><span>Training rows</span></div>
+          <div class="hero-stat"><strong id="laminar-count">—</strong><span>Laminar cases</span></div>
+          <div class="hero-stat"><strong id="turbulent-count">—</strong><span>Turbulent cases</span></div>
+          <div class="hero-stat"><strong id="drag-range">—</strong><span>Drag range</span></div>
         </div>
       </section>
 
+      <!-- INFERENCE -->
       <section class="inference" id="inference" aria-label="Generate candidate designs">
-        <form id="generate-form" class="inference-form">
-          <div>
-            <p class="eyebrow">On-demand inference</p>
-            <h2>Generate designs for any Cd and regime</h2>
-          </div>
-          <label>
-            Target Cd
-            <input id="target-cd" name="cd" type="number" min="0.1" max="3" step="0.01" value="1.10" />
-          </label>
-          <label>
-            Regime
-            <select id="regime" name="regime">
-              <option value="1">Turbulent</option>
-              <option value="0">Laminar</option>
-            </select>
-          </label>
-          <label>
-            Designs
-            <input id="design-count" name="count" type="number" min="1" max="12" step="1" value="5" />
-          </label>
-          <button type="submit">Generate</button>
-        </form>
-        <div class="inference-result">
-          <div class="result-bar">
-            <span id="inference-status">Ready</span>
-            <span id="inference-latency">API latency: -</span>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Diameter</th>
-                  <th>X center</th>
-                  <th>Height</th>
-                  <th>Pred Cd</th>
-                  <th>Re</th>
-                </tr>
-              </thead>
-              <tbody id="design-table"></tbody>
-            </table>
+        <div class="section-label">On-demand inference</div>
+        <h2 class="section-title">Generate designs for any Cd and regime</h2>
+        <div class="inference-grid">
+          <form id="generate-form" class="card inference-form">
+            <label class="field-group">
+              <span class="field-label">Target Drag Coefficient (Cd)</span>
+              <input id="target-cd" name="cd" type="number" min="0.1" max="3" step="0.01" value="1.10" />
+            </label>
+            <label class="field-group">
+              <span class="field-label">Flow Regime</span>
+              <select id="regime" name="regime">
+                <option value="1">Turbulent</option>
+                <option value="0">Laminar</option>
+              </select>
+            </label>
+            <label class="field-group">
+              <span class="field-label">Number of Designs</span>
+              <input id="design-count" name="count" type="number" min="1" max="12" step="1" value="5" />
+            </label>
+            <button type="submit" class="btn btn-primary full-width">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polygon points="5,3 19,12 5,21"/></svg>
+              Generate
+            </button>
+          </form>
+
+          <div class="card inference-result">
+            <div class="result-bar">
+              <div class="result-status">
+                <span class="status-dot ready" id="status-dot"></span>
+                <span id="inference-status">Ready</span>
+              </div>
+              <span class="result-latency" id="inference-latency">API latency: —</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Diameter</th>
+                    <th>X center</th>
+                    <th>Height</th>
+                    <th>Pred Cd</th>
+                    <th>Re</th>
+                  </tr>
+                </thead>
+                <tbody id="design-table">
+                  <tr><td colspan="6" class="table-empty">Waiting for first generation…</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="metrics" aria-label="Dataset metrics">
-        <article>
-          <span>Final rows</span>
-          <strong id="training-rows">-</strong>
-        </article>
-        <article>
-          <span>Laminar cases</span>
-          <strong id="laminar-count">-</strong>
-        </article>
-        <article>
-          <span>Turbulent cases</span>
-          <strong id="turbulent-count">-</strong>
-        </article>
-        <article>
-          <span>Drag range</span>
-          <strong id="drag-range">-</strong>
-        </article>
-      </section>
-
-      <section class="gallery">
-        <figure>
-          <img src="validation_final.png" alt="Validation chart comparing target and simulated drag coefficients" />
-          <figcaption>Final diffusion validation</figcaption>
-        </figure>
-        <figure>
-          <img src="diffusion_loss.png" alt="Diffusion training loss curve" />
-          <figcaption>Diffusion convergence</figcaption>
-        </figure>
-        <figure>
-          <img src="cgan_improved_designs.png" alt="Generated cGAN design samples" />
-          <figcaption>cGAN design samples</figcaption>
-        </figure>
-      </section>
-
-      <section class="table-section">
-        <div>
-          <p class="eyebrow">Validated candidates</p>
-          <h2>Target Cd to simulated Cd</h2>
+      <!-- GALLERY -->
+      <section class="gallery-section" aria-label="Training visualizations">
+        <div class="section-label">Model artefacts</div>
+        <h2 class="section-title">Training &amp; validation charts</h2>
+        <div class="gallery">
+          <figure class="card gallery-card">
+            <img src="validation_final.png" alt="Validation chart comparing target and simulated drag coefficients" loading="lazy" width="800" height="600" />
+            <figcaption>Final diffusion validation</figcaption>
+          </figure>
+          <figure class="card gallery-card">
+            <img src="diffusion_loss.png" alt="Diffusion training loss curve" loading="lazy" width="800" height="600" />
+            <figcaption>Diffusion convergence</figcaption>
+          </figure>
+          <figure class="card gallery-card">
+            <img src="cgan_improved_designs.png" alt="Generated cGAN design samples" loading="lazy" width="800" height="600" />
+            <figcaption>cGAN design samples</figcaption>
+          </figure>
         </div>
-        <div class="table-wrap">
+      </section>
+
+      <!-- VALIDATION TABLE -->
+      <section class="data-section" id="data" aria-label="Validated candidates">
+        <div class="section-label">Validated candidates</div>
+        <h2 class="section-title">Target Cd → Simulated Cd</h2>
+        <div class="card table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Target</th>
+                <th>Target Cd</th>
                 <th>Regime</th>
                 <th>Diameter</th>
                 <th>Actual Cd</th>
                 <th>Error</th>
               </tr>
             </thead>
-            <tbody id="validation-table"></tbody>
+            <tbody id="validation-table">
+              <tr><td colspan="5" class="table-empty">Loading…</td></tr>
+            </tbody>
           </table>
         </div>
       </section>
+
     </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>Generative Design Engine — Naval Singh</span>
+        <a href="https://github.com/Flacko-07/generative-design-engine" target="_blank" rel="noopener noreferrer">View source on GitHub</a>
+      </div>
+    </footer>
+
     <script src="app.js"></script>
+    <script>
+      (function(){
+        const t=document.querySelector('[data-theme-toggle]');
+        const r=document.documentElement;
+        let d=r.getAttribute('data-theme')||'dark';
+        function setTheme(theme){
+          d=theme;
+          r.setAttribute('data-theme',d);
+          if(t){
+            t.setAttribute('aria-label','Switch to '+(d==='dark'?'light':'dark')+' mode');
+            t.innerHTML=d==='dark'
+              ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+              :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+          }
+        }
+        setTheme(d);
+        t&&t.addEventListener('click',()=>setTheme(d==='dark'?'light':'dark'));
+      })();
+    </script>
   </body>
 </html>
